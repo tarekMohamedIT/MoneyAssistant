@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="10dp"
+    app:cardCornerRadius="20dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:weightSum="10">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="9"
+            android:orientation="vertical"
+            android:paddingRight="20dp">
+
+            <TextView
+                android:id="@+id/walletNameTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="New wallet(primary)"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline" />
+
+            <TextView
+                android:id="@+id/walletInfoTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="TextView"
+                android:textAppearance="@style/TextAppearance.AppCompat" />
+        </LinearLayout>
+
+        <com.r3tr0.graphengine.core.circles.PieChart
+            android:id="@+id/mainPieChart"
+            android:layout_width="@dimen/circular_progress_height"
+            android:layout_height="@dimen/circular_progress_height"
+            android:layout_weight="1"
+            app:circleColor="@android:color/background_light"
+            app:pieStrokeWidth="@dimen/circular_Progress_bar_width" />
+
+    </LinearLayout>
+</android.support.v7.widget.CardView>
