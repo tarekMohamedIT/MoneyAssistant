@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <dimen name="circular_progress_height">120dp</dimen>
-    <dimen name="circular_Progress_bar_width">25dp</dimen>
+    <dimen name="circular_progress_height">80dp</dimen>
+    <dimen name="circular_Progress_bar_width">16dp</dimen>
     <dimen name="normal_text_size">22sp</dimen>
     <dimen name="design_fab_size_mini" tools:override="true">80dp</dimen>
     <dimen name="design_fab_content_size" tools:override="true">60dp</dimen>
+    <dimen name="items_offset">8dp</dimen>
 </resources>

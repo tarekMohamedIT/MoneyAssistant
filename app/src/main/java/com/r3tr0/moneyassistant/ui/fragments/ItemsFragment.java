@@ -61,16 +61,6 @@ public class ItemsFragment extends Fragment implements View.OnClickListener {
         menu = new PopupMenu(getContext(), null);
 
         model = (ItemsDatabaseModel) ((MainActivity) getActivity()).getDatabaseManager().getModelByClass(ItemsDatabaseModel.class);
-        task = new GetAllItemsTask(model);
-
-        task.setOnProcessingEndListener(new OnProcessingEndListener<List<Item>>() {
-            @Override
-            public void onProcessingEnd(List<Item> items) {
-                adapter.getItems().clear();
-                adapter.getItems().addAll(items);
-                adapter.notifyDataSetChanged();
-            }
-        });
 
         yearsButton.setOnClickListener(this);
         monthsButton.setOnClickListener(this);
@@ -140,7 +130,18 @@ public class ItemsFragment extends Fragment implements View.OnClickListener {
     public void onResume() {
         super.onResume();
         if (task != null)
-            task.execute();
+            task.cancel(true);
+
+        task = new GetAllItemsTask(model);
+        task.setOnProcessingEndListener(new OnProcessingEndListener<List<Item>>() {
+            @Override
+            public void onProcessingEnd(List<Item> items) {
+                adapter.getItems().clear();
+                adapter.getItems().addAll(items);
+                adapter.notifyDataSetChanged();
+            }
+        });
+        task.execute();
     }
 
     @Override

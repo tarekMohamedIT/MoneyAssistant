@@ -3,6 +3,8 @@ package com.r3tr0.moneyassistant.ui.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -47,12 +49,16 @@ public class WalletFragment extends Fragment {
         recyclerView = view.findViewById(R.id.mainRecyclerView);
 
 
-        LinearLayoutManager manager = new LinearLayoutManager(this.getContext(), LinearLayoutManager.VERTICAL, false);
+        GridLayoutManager manager = new GridLayoutManager(this.getContext(), 2, LinearLayoutManager.VERTICAL, false);
 
         adapter = new WalletRecyclerAdapter(this.getContext());
 
         recyclerView.setLayoutManager(manager);
         recyclerView.setAdapter(adapter);
+
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
+                DividerItemDecoration.HORIZONTAL);
+        recyclerView.addItemDecoration(dividerItemDecoration);
 
         model = (WalletsDatabaseModel) ((MainActivity) getActivity()).getDatabaseManager().getModelByClass(WalletsDatabaseModel.class);
         task = new GetAllWalletsTask(model);
@@ -73,6 +79,13 @@ public class WalletFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        task = new GetAllWalletsTask(model);
+        task.setOnProcessingEndListener(new OnProcessingEndListener<List<Wallet>>() {
+            @Override
+            public void onProcessingEnd(List<Wallet> wallets) {
+                adapter.replaceItems(wallets);
+            }
+        });
         task.execute();
     }
 
@@ -80,5 +93,6 @@ public class WalletFragment extends Fragment {
     public void onPause() {
         super.onPause();
         task.cancel(true);
+        task = null;
     }
 }

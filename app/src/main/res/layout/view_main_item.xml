@@ -15,12 +15,11 @@
             android:id="@+id/itemNameTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
             android:layout_marginBottom="8dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:text="TextView"
-            android:textAppearance="@style/TextAppearance.AppCompat.Menu" />
+            android:gravity="center_horizontal"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:text="Sandwich" />
 
         <TextView
             android:id="@+id/informationTextView"

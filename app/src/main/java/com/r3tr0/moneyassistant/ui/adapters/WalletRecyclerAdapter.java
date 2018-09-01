@@ -67,9 +67,10 @@ public class WalletRecyclerAdapter extends RecyclerView.Adapter<WalletRecyclerAd
                 new PieChart.PieItem("total", (float) wallets.get(pos).getTotalMoney(), Color.parseColor("#66bb6a"))
                 , new PieChart.PieItem("remaining", (float) (wallets.get(pos).getTotalMoney() - wallets.get(pos).getRemainingMoney()), Color.parseColor("#795548"))));
 
-        holder.walletNameTextView.setText(String.format("<%s>\n%s", (wallets.get(pos).isPrimary()? "primary" : "secondary"), wallets.get(pos).getName()));
+        holder.walletNameTextView.setText(wallets.get(pos).getName());
+        holder.walletTypeTextView.setText((wallets.get(pos).isPrimary() ? "primary" : "secondary"));
 
-        holder.walletInfoTextView.setText(String.format("Total:$%s\nRemaining(Cyan):$%s\nSpent(Gray):$%s"
+        holder.walletInfoTextView.setText(String.format("Total:$%s\nRemaining:$%s\nSpent:$%s"
                 , wallets.get(position).getTotalMoney()
                 , wallets.get(pos).getRemainingMoney()
                 , wallets.get(position).getTotalMoney() - wallets.get(pos).getRemainingMoney()));
@@ -97,6 +98,7 @@ public class WalletRecyclerAdapter extends RecyclerView.Adapter<WalletRecyclerAd
 
     public class MainViewHolder extends RecyclerView.ViewHolder{
 
+        TextView walletTypeTextView;
         TextView walletNameTextView;
         TextView walletInfoTextView;
         PieChart chart;
@@ -104,6 +106,7 @@ public class WalletRecyclerAdapter extends RecyclerView.Adapter<WalletRecyclerAd
         public MainViewHolder(View itemView) {
             super(itemView);
                 chart = itemView.findViewById(R.id.mainPieChart);
+            walletTypeTextView = itemView.findViewById(R.id.typeTextView);
                 walletNameTextView = itemView.findViewById(R.id.walletNameTextView);
                 walletInfoTextView = itemView.findViewById(R.id.walletInfoTextView);
         }
