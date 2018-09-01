@@ -13,11 +13,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import com.r3tr0.moneyassistant.R;
+import com.r3tr0.moneyassistant.core.database.models.ItemsDatabaseModel;
+import com.r3tr0.moneyassistant.core.interfaces.OnProcessingEndListener;
+import com.r3tr0.moneyassistant.core.models.Item;
+import com.r3tr0.moneyassistant.logic.threadding.GetAllItemsTask;
 import com.r3tr0.moneyassistant.ui.activities.MainActivity;
 import com.r3tr0.moneyassistant.ui.adapters.ItemsRecyclerAdapter;
-import com.r3tr0.moneyassistant.core.database.models.ItemsDatabaseModel;
 import com.r3tr0.moneyassistant.utils.dialogs.PopupMenu;
-import com.r3tr0.moneyassistant.core.models.Item;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,25 +34,8 @@ public class ItemsFragment extends Fragment implements View.OnClickListener {
     PopupMenu menu;
     ArrayList<String> strings;
     ItemsDatabaseModel model;
+    GetAllItemsTask task;
 
-    Thread databaseHandler;
-    Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            model = (ItemsDatabaseModel) ((MainActivity)getActivity()).getDatabaseManager().getModelByClass(ItemsDatabaseModel.class);
-            if (model != null && adapter != null){
-                final List<Item> items = model.getAllItems();
-                itemsRecyclerView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        adapter.getItems().clear();
-                        adapter.getItems().addAll(items);
-                        adapter.notifyDataSetChanged();
-                    }
-                });
-            }
-        }
-    };
 
     public ItemsFragment() {
         // Required empty public constructor
@@ -75,6 +60,18 @@ public class ItemsFragment extends Fragment implements View.OnClickListener {
 
         menu = new PopupMenu(getContext(), null);
 
+        model = (ItemsDatabaseModel) ((MainActivity) getActivity()).getDatabaseManager().getModelByClass(ItemsDatabaseModel.class);
+        task = new GetAllItemsTask(model);
+
+        task.setOnProcessingEndListener(new OnProcessingEndListener<List<Item>>() {
+            @Override
+            public void onProcessingEnd(List<Item> items) {
+                adapter.getItems().clear();
+                adapter.getItems().addAll(items);
+                adapter.notifyDataSetChanged();
+            }
+        });
+
         yearsButton.setOnClickListener(this);
         monthsButton.setOnClickListener(this);
         daysButton.setOnClickListener(this);
@@ -86,7 +83,6 @@ public class ItemsFragment extends Fragment implements View.OnClickListener {
         itemsRecyclerView.setLayoutManager(layoutManager);
         itemsRecyclerView.setAdapter(adapter);
 
-        databaseHandler = new Thread(runnable);
 
     }
 
@@ -143,16 +139,13 @@ public class ItemsFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
-        databaseHandler = new Thread(runnable);
-        databaseHandler.start();
+        if (task != null)
+            task.execute();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        if (databaseHandler != null) {
-            databaseHandler.interrupt();
-            databaseHandler = null;
-        }
+        task.cancel(true);
     }
 }

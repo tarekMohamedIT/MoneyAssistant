@@ -10,10 +10,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.r3tr0.moneyassistant.R;
+import com.r3tr0.moneyassistant.core.database.models.WalletsDatabaseModel;
+import com.r3tr0.moneyassistant.core.interfaces.OnProcessingEndListener;
+import com.r3tr0.moneyassistant.core.models.Wallet;
+import com.r3tr0.moneyassistant.logic.threadding.GetAllWalletsTask;
 import com.r3tr0.moneyassistant.ui.activities.MainActivity;
 import com.r3tr0.moneyassistant.ui.adapters.WalletRecyclerAdapter;
-import com.r3tr0.moneyassistant.core.database.models.WalletsDatabaseModel;
-import com.r3tr0.moneyassistant.core.models.Wallet;
 
 import java.util.List;
 
@@ -25,23 +27,7 @@ public class WalletFragment extends Fragment {
     RecyclerView recyclerView;
     WalletRecyclerAdapter adapter;
     WalletsDatabaseModel model;
-    List<Wallet> wallets;
-    Thread databaseHandler;
-    Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            model = (WalletsDatabaseModel) ((MainActivity)getActivity()).getDatabaseManager().getModelByClass(WalletsDatabaseModel.class);
-            if (model != null && adapter != null){
-                wallets = model.getAllItems();
-                recyclerView.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        adapter.replaceItems(wallets);
-                    }
-                });
-            }
-        }
-    };
+    GetAllWalletsTask task;
 
     public WalletFragment() {
         // Required empty public constructor
@@ -68,7 +54,15 @@ public class WalletFragment extends Fragment {
         recyclerView.setLayoutManager(manager);
         recyclerView.setAdapter(adapter);
 
-        databaseHandler = new Thread(runnable);
+        model = (WalletsDatabaseModel) ((MainActivity) getActivity()).getDatabaseManager().getModelByClass(WalletsDatabaseModel.class);
+        task = new GetAllWalletsTask(model);
+
+        task.setOnProcessingEndListener(new OnProcessingEndListener<List<Wallet>>() {
+            @Override
+            public void onProcessingEnd(List<Wallet> wallets) {
+                adapter.replaceItems(wallets);
+            }
+        });
     }
 
     @Override
@@ -79,16 +73,12 @@ public class WalletFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        databaseHandler = new Thread(runnable);
-        databaseHandler.start();
+        task.execute();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        if (databaseHandler != null) {
-            databaseHandler.interrupt();
-            databaseHandler = null;
-        }
+        task.cancel(true);
     }
 }
