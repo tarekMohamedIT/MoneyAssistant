@@ -3,6 +3,7 @@ package com.r3tr0.moneyassistant.ui.adapters;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,6 +48,11 @@ public class WalletRecyclerAdapter extends RecyclerView.Adapter<WalletRecyclerAd
         return wallets;
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        return ((position % 2 == 0 || position == 0) ? 0 : 1);
+    }
+
     @NonNull
     @Override
     public MainViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -62,6 +68,12 @@ public class WalletRecyclerAdapter extends RecyclerView.Adapter<WalletRecyclerAd
     public void onBindViewHolder(@NonNull MainViewHolder holder, int position) {
 
         final int pos = position;
+
+        if (getItemViewType(pos) == 0) {
+            GridLayoutManager.LayoutParams p = (GridLayoutManager.LayoutParams) holder.itemView.getLayoutParams();
+            p.rightMargin = (int) context.getResources().getDimension(R.dimen.items_offset);
+            holder.itemView.setLayoutParams(p);
+        }
 
         holder.chart.replaceItems(Arrays.asList(
                 new PieChart.PieItem("total", (float) wallets.get(pos).getTotalMoney(), Color.parseColor("#66bb6a"))
