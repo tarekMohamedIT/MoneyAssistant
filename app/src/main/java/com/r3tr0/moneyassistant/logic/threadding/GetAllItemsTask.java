@@ -1,21 +1,52 @@
 package com.r3tr0.moneyassistant.logic.threadding;
 
+import android.util.Log;
+
 import com.r3tr0.moneyassistant.core.database.models.ItemsDatabaseModel;
 import com.r3tr0.moneyassistant.core.interfaces.IUseCase;
+import com.r3tr0.moneyassistant.core.interfaces.OnDatabaseRowReadListener;
 import com.r3tr0.moneyassistant.core.models.Item;
 
 import java.util.List;
 
+import CSTime.DateTime;
+
 public class GetAllItemsTask extends BaseBackgroundTask {
     private ItemsDatabaseModel model;
 
-    public GetAllItemsTask(final ItemsDatabaseModel model) {
-        super(new IUseCase<List<Item>>() {
+
+    public GetAllItemsTask(ItemsDatabaseModel databaseModel) {
+        super();
+        this.model = databaseModel;
+        setUseCase(new IUseCase<List<Item>>() {
+            private DateTime currentDate;
             @Override
             public List<Item> processInBackground() {
-                return model.getAllItems();
+                model.setOnDatabaseRowReadListener(new OnDatabaseRowReadListener() {
+                    @Override
+                    public void onRowRead(List<Item> items, Item item) {
+                        Log.e("current date status", currentDate == null ? "is" : "isn't");//checking on the current date
+
+                        if (currentDate == null //first time running
+                                || currentDate.compareTo(item.getPurchaseDate()) != 0) { //comparing two times
+
+                            items.add(new Item(0
+                                    , ""
+                                    , 0
+                                    , 0
+                                    , item.getPurchaseDate()
+                                    , 0));
+
+                            currentDate = new DateTime(item.getPurchaseDate().getTimeInMilliseconds());
+                        }
+                    }
+                });
+
+                List<Item> items = model.getAllItems();
+                model.setOnDatabaseRowReadListener(null);
+                currentDate = null;
+                return items;
             }
         });
-        this.model = model;
     }
 }

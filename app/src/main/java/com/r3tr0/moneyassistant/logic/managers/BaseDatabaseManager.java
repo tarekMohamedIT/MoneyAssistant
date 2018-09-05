@@ -10,7 +10,7 @@ public abstract class BaseDatabaseManager implements IDatabaseManager<Cursor> {
     private boolean isOpened = false;
     protected Context context;
     protected String databaseName;
-    protected SQLiteDatabase database;
+    protected static SQLiteDatabase database;
 
     public BaseDatabaseManager(Context context, String databaseName){
         this.databaseName = databaseName;
@@ -21,7 +21,7 @@ public abstract class BaseDatabaseManager implements IDatabaseManager<Cursor> {
     @Override
     public synchronized void createDatabase(String databaseName) {
         if (!isOpened) {
-            database = context.openOrCreateDatabase(databaseName,Context.MODE_PRIVATE, null);
+            database = context.openOrCreateDatabase(databaseName, Context.MODE_PRIVATE, null);
             isOpened = true;
         }
     }

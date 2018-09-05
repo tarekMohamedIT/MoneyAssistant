@@ -3,6 +3,7 @@ package com.r3tr0.moneyassistant.core.database.models;
 import android.database.Cursor;
 
 import com.r3tr0.moneyassistant.core.interfaces.IDatabaseManager;
+import com.r3tr0.moneyassistant.core.interfaces.OnDatabaseRowReadListener;
 import com.r3tr0.moneyassistant.core.models.Item;
 
 import java.util.ArrayList;
@@ -11,8 +12,18 @@ import java.util.List;
 import CSTime.DateTime;
 
 public class ItemsDatabaseModel extends BaseDatabaseModel<Item> {
+    private OnDatabaseRowReadListener onDatabaseRowReadListener;
+
     public ItemsDatabaseModel(IDatabaseManager manager) {
         super(manager);
+    }
+
+    public OnDatabaseRowReadListener getOnDatabaseRowReadListener() {
+        return onDatabaseRowReadListener;
+    }
+
+    public void setOnDatabaseRowReadListener(OnDatabaseRowReadListener onDatabaseRowReadListener) {
+        this.onDatabaseRowReadListener = onDatabaseRowReadListener;
     }
 
     @Override
@@ -33,6 +44,7 @@ public class ItemsDatabaseModel extends BaseDatabaseModel<Item> {
 
     @Override
     public void addNew(Item data) {
+
         manager.executeOrder("insert into items (name, quantity, price, date, walletID) values (" +
                 "'" + data.getName() + "'," +
                 "" + data.getQuantity() + "," +
@@ -52,13 +64,18 @@ public class ItemsDatabaseModel extends BaseDatabaseModel<Item> {
         Cursor cursor = (Cursor) manager.executeQuery("select * from items");
 
         while (cursor.moveToNext()){
-            items.add(new Item(
+            Item item = new Item(
                     cursor.getInt(0)
                     , cursor.getString(1)
                     , cursor.getDouble(3)
                     , cursor.getInt(2)
                     , new DateTime(cursor.getLong(4))
-                    , cursor.getInt(5)));
+                    , cursor.getInt(5));
+
+            if (onDatabaseRowReadListener != null)
+                onDatabaseRowReadListener.onRowRead(items, item);
+
+            items.add(item);
         }
         return items;
     }

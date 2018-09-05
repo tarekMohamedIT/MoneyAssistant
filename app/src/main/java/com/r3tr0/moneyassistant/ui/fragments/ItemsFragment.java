@@ -36,6 +36,15 @@ public class ItemsFragment extends Fragment implements View.OnClickListener {
     ItemsDatabaseModel model;
     GetAllItemsTask task;
 
+    OnProcessingEndListener<List<Item>> listOnProcessingEndListener = new OnProcessingEndListener<List<Item>>() {
+        @Override
+        public void onProcessingEnd(List<Item> items) {
+            adapter.getItems().clear();
+            adapter.getItems().addAll(items);
+            adapter.notifyDataSetChanged();
+        }
+    };
+
 
     public ItemsFragment() {
         // Required empty public constructor
@@ -66,7 +75,13 @@ public class ItemsFragment extends Fragment implements View.OnClickListener {
         monthsButton.setOnClickListener(this);
         daysButton.setOnClickListener(this);
 
-        GridLayoutManager layoutManager = new GridLayoutManager(this.getContext(), 3, LinearLayoutManager.VERTICAL, false);
+        GridLayoutManager layoutManager = new GridLayoutManager(this.getContext(), 2, LinearLayoutManager.VERTICAL, false);
+        layoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+            @Override
+            public int getSpanSize(int position) {
+                return adapter.getItemViewType(position);
+            }
+        });
 
         adapter = new ItemsRecyclerAdapter(this.getContext(), new ArrayList<Item>());
 
@@ -133,14 +148,7 @@ public class ItemsFragment extends Fragment implements View.OnClickListener {
             task.cancel(true);
 
         task = new GetAllItemsTask(model);
-        task.setOnProcessingEndListener(new OnProcessingEndListener<List<Item>>() {
-            @Override
-            public void onProcessingEnd(List<Item> items) {
-                adapter.getItems().clear();
-                adapter.getItems().addAll(items);
-                adapter.notifyDataSetChanged();
-            }
-        });
+        task.setOnProcessingEndListener(listOnProcessingEndListener);
         task.execute();
     }
 
@@ -148,5 +156,6 @@ public class ItemsFragment extends Fragment implements View.OnClickListener {
     public void onPause() {
         super.onPause();
         task.cancel(true);
+        task = null;
     }
 }

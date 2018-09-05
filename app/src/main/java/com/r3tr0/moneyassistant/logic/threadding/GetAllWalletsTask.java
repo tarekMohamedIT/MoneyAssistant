@@ -9,13 +9,14 @@ import java.util.List;
 public class GetAllWalletsTask extends BaseBackgroundTask {
     private WalletsDatabaseModel model;
 
-    public GetAllWalletsTask(final WalletsDatabaseModel model) {
-        super(new IUseCase<List<Wallet>>() {
+    public GetAllWalletsTask(WalletsDatabaseModel databaseModel) {
+        super();
+        setUseCase(new IUseCase<List<Wallet>>() {
             @Override
             public List<Wallet> processInBackground() {
                 return model.getAllItems();
             }
         });
-        this.model = model;
+        this.model = databaseModel;
     }
 }

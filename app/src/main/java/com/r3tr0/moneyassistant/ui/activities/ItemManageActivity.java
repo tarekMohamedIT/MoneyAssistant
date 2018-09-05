@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -12,13 +13,15 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.r3tr0.moneyassistant.R;
-import com.r3tr0.moneyassistant.logic.managers.InteractionsDatabaseManager;
 import com.r3tr0.moneyassistant.core.database.models.ItemsDatabaseModel;
 import com.r3tr0.moneyassistant.core.database.models.WalletsDatabaseModel;
-import com.r3tr0.moneyassistant.utils.enums.TransitionFlags;
+import com.r3tr0.moneyassistant.core.interfaces.OnProcessingEndListener;
 import com.r3tr0.moneyassistant.core.models.Item;
-import com.r3tr0.moneyassistant.utils.Regex;
 import com.r3tr0.moneyassistant.core.models.Wallet;
+import com.r3tr0.moneyassistant.logic.managers.InteractionsDatabaseManager;
+import com.r3tr0.moneyassistant.logic.threadding.GetAllWalletsTask;
+import com.r3tr0.moneyassistant.utils.Regex;
+import com.r3tr0.moneyassistant.utils.enums.TransitionFlags;
 
 import java.util.List;
 
@@ -32,19 +35,10 @@ public class ItemManageActivity extends AppCompatActivity {
     Spinner walletsSpinner;
 
     InteractionsDatabaseManager manager;
+    GetAllWalletsTask task;
 
     Item item;
     List<Wallet> wallets;
-
-    Thread thread;
-    Runnable getWalletsRunnable = new Runnable() {
-        @Override
-        public void run() {
-            wallets = ((WalletsDatabaseModel) manager.getModelByClass(WalletsDatabaseModel.class)).getAllItems();
-            ArrayAdapter adapter = new ArrayAdapter<>(ItemManageActivity.this, android.R.layout.simple_list_item_1, wallets);
-            walletsSpinner.setAdapter(adapter);
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,11 +79,14 @@ public class ItemManageActivity extends AppCompatActivity {
                     showAlert("error", "Please enter a valid digit in the quantity!", null);
 
                 else { //data is correct!
+                    DateTime purchaseDate = DateTime.getNow();
+                    DateTime realDate = new DateTime(purchaseDate.getYears(), purchaseDate.getMonthNumeric(), purchaseDate.getDayOfMonth());
+                    Log.e("item date", realDate.getDateTime(true, true));
                     Item newItem = new Item(0
                             , nameEditText.getText().toString()
                             , Double.parseDouble(priceEditText.getText().toString())
                             , Double.parseDouble(quantityEditText.getText().toString())
-                            , DateTime.getNow()
+                            , realDate
                             , wallets.get(walletsSpinner.getSelectedItemPosition()).getWalletID());
 
                     if (item != null) { //Item update process
@@ -114,12 +111,20 @@ public class ItemManageActivity extends AppCompatActivity {
             }
         });
 
-
     }
 
     void initWallets() {
         manager = new InteractionsDatabaseManager(this);
-        thread = new Thread(getWalletsRunnable);
+        task = new GetAllWalletsTask((WalletsDatabaseModel) manager.getModelByClass(WalletsDatabaseModel.class));
+        task.setOnProcessingEndListener(new OnProcessingEndListener<List<Wallet>>() {
+            @Override
+            public void onProcessingEnd(List<Wallet> walletsList) {
+                wallets = walletsList;
+                ArrayAdapter adapter = new ArrayAdapter<>(ItemManageActivity.this, android.R.layout.simple_list_item_1, wallets);
+                walletsSpinner.setAdapter(adapter);
+            }
+        });
+        task.execute();
     }
 
     void showAlert(String title, String message, DialogInterface.OnClickListener listener) {
@@ -134,15 +139,10 @@ public class ItemManageActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         initWallets();
-        thread.start();
     }
 
     @Override
     protected void onPause() {
-        this.manager.closeConnection();
-        this.manager.clearModels();
-        this.manager = null;
-        thread = null;
         super.onPause();
     }
 }

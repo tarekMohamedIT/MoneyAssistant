@@ -6,17 +6,18 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.r3tr0.moneyassistant.logic.managers.MultiModelDatabaseManager;
+import com.r3tr0.moneyassistant.R;
 import com.r3tr0.moneyassistant.core.database.models.ItemsDatabaseModel;
 import com.r3tr0.moneyassistant.core.database.models.WalletsDatabaseModel;
-import com.r3tr0.moneyassistant.utils.enums.TransitionFlags;
+import com.r3tr0.moneyassistant.logic.managers.MultiModelDatabaseManager;
+import com.r3tr0.moneyassistant.ui.adapters.MainPagerAdapter;
 import com.r3tr0.moneyassistant.ui.fragments.ItemsFragment;
 import com.r3tr0.moneyassistant.ui.fragments.WalletFragment;
-import com.r3tr0.moneyassistant.R;
-import com.r3tr0.moneyassistant.ui.adapters.MainPagerAdapter;
+import com.r3tr0.moneyassistant.utils.enums.TransitionFlags;
 
 import java.util.ArrayList;
 
@@ -92,9 +93,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void initDatabase(){
-        databaseManager = new MultiModelDatabaseManager(this);
+        databaseManager = new MultiModelDatabaseManager(getApplicationContext());
         databaseManager.addNewModel(new ItemsDatabaseModel(databaseManager));
         databaseManager.addNewModel(new WalletsDatabaseModel(databaseManager));
+        Log.e("dbTest", "Database opened");
+    }
+
+    void resetDatabase() {
+        databaseManager.getModel(0).clearAll();
+        databaseManager.getModel(1).clearAll();
     }
 
     public MultiModelDatabaseManager getDatabaseManager() {
@@ -102,16 +109,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onPause() {
+    protected void onDestroy() {
+        super.onDestroy();
         this.databaseManager.closeConnection();
         this.databaseManager.clearModels();
         this.databaseManager = null;
-        super.onPause();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         initDatabase();
+        //resetDatabase();
     }
 }

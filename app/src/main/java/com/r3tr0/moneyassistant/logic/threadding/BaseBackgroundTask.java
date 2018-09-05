@@ -11,7 +11,15 @@ public abstract class BaseBackgroundTask<Output>
     private IUseCase<Output> useCase;
     private OnProcessingEndListener<Output> onProcessingEndListener;
 
+    public BaseBackgroundTask() {
+
+    }
+
     protected BaseBackgroundTask(IUseCase<Output> useCase) {
+        this.useCase = useCase;
+    }
+
+    public void setUseCase(IUseCase<Output> useCase) {
         this.useCase = useCase;
     }
 
