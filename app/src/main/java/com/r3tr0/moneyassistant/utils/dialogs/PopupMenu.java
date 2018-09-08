@@ -7,8 +7,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 import com.r3tr0.graphengine.core.popups.PopupView;
-import com.r3tr0.moneyassistant.ui.adapters.StringsRecyclerAdapter;
 import com.r3tr0.moneyassistant.core.interfaces.OnItemClickListener;
+import com.r3tr0.moneyassistant.ui.adapters.StringsRecyclerAdapter;
 
 import java.util.ArrayList;
 
@@ -16,6 +16,7 @@ public class PopupMenu extends PopupView{
     private Context context;
     private RecyclerView recyclerView;
     private StringsRecyclerAdapter adapter;
+    private OnItemClickListener onItemClickListener;
 
     public PopupMenu(Context context, View anchorView) {
         super(context, new RecyclerView(context), anchorView);
@@ -26,11 +27,17 @@ public class PopupMenu extends PopupView{
         adapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onClick(int position, View view) {
+                if (onItemClickListener != null)
+                    onItemClickListener.onClick(position, view);
                 popupWindow.dismiss();
             }
         });
 
         recyclerView.setAdapter(adapter);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
     }
 
     public void setParentView(View parentView){

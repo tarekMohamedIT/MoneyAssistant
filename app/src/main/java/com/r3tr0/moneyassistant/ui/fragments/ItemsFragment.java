@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import android.widget.Button;
 
 import com.r3tr0.moneyassistant.R;
 import com.r3tr0.moneyassistant.core.database.models.ItemsDatabaseModel;
+import com.r3tr0.moneyassistant.core.interfaces.OnItemClickListener;
 import com.r3tr0.moneyassistant.core.interfaces.OnProcessingEndListener;
 import com.r3tr0.moneyassistant.core.models.Item;
 import com.r3tr0.moneyassistant.logic.threadding.GetAllItemsTask;
@@ -35,6 +37,8 @@ public class ItemsFragment extends Fragment implements View.OnClickListener {
     ArrayList<String> strings;
     ItemsDatabaseModel model;
     GetAllItemsTask task;
+
+    int year = 0, month = 0, day = 0;
 
     OnProcessingEndListener<List<Item>> listOnProcessingEndListener = new OnProcessingEndListener<List<Item>>() {
         @Override
@@ -87,8 +91,6 @@ public class ItemsFragment extends Fragment implements View.OnClickListener {
 
         itemsRecyclerView.setLayoutManager(layoutManager);
         itemsRecyclerView.setAdapter(adapter);
-
-
     }
 
     @Override
@@ -97,35 +99,80 @@ public class ItemsFragment extends Fragment implements View.OnClickListener {
 
         if (v.getId() == R.id.yearsButton){
             strings.clear();
+            strings = (ArrayList<String>) model.getAllYears();
+            menu.setOnItemClickListener(new OnItemClickListener() {
+                @Override
+                public void onClick(int position, View view) {
+                    if (position == 0) {
+                        year = 0;
+                        month = 0;
+                        day = 0;
 
-            strings.add("All");
-            strings.add("1990");
-            strings.add("1991");
-            strings.add("1992");
-            strings.add("1993");
-            strings.add("1994");
+                        daysButton.setText("All");
+                        monthsButton.setText("All");
+                        yearsButton.setText("All");
+                    } else {
+                        year = Integer.parseInt(strings.get(position));
+                        month = 0;
+                        day = 0;
+
+                        daysButton.setText("All");
+                        monthsButton.setText("All");
+                        yearsButton.setText(String.format("%s", year));
+                    }
+                    fetchData();
+                }
+            });
         }
 
         else if (v.getId() == R.id.monthsButton){
             strings.clear();
+            if (year == 0)
+                strings.add("all");
+            else {
+                strings = (ArrayList<String>) model.getMonths(year);
+                menu.setOnItemClickListener(new OnItemClickListener() {
+                    @Override
+                    public void onClick(int position, View view) {
+                        if (position == 0) {
+                            month = 0;
+                            day = 0;
 
-            strings.add("All");
-            strings.add("Jan");
-            strings.add("Feb");
-            strings.add("Mar");
-            strings.add("Apr");
-            strings.add("May");
+                            daysButton.setText("All");
+                            monthsButton.setText("All");
+                        } else {
+                            month = Integer.parseInt(strings.get(position));
+                            day = 0;
+
+                            daysButton.setText("All");
+                            monthsButton.setText(String.format("%02d", month));
+                        }
+                        fetchData();
+                    }
+                });
+            }
         }
 
         else {
             strings.clear();
-
-            strings.add("All");
-            strings.add("1");
-            strings.add("2");
-            strings.add("3");
-            strings.add("4");
-            strings.add("5");
+            if (month == 0)
+                strings.add("all");
+            else {
+                strings = (ArrayList<String>) model.getDays(year, month);
+                menu.setOnItemClickListener(new OnItemClickListener() {
+                    @Override
+                    public void onClick(int position, View view) {
+                        if (position == 0) {
+                            day = 0;
+                            daysButton.setText("All");
+                        } else {
+                            day = Integer.parseInt(strings.get(position));
+                            daysButton.setText(String.format("%02d", day));
+                        }
+                        fetchData();
+                    }
+                });
+            }
         }
 
         menu.getAdapter().getStringsList().clear();
@@ -136,6 +183,15 @@ public class ItemsFragment extends Fragment implements View.OnClickListener {
         menu.showList(300);
     }
 
+    void fetchData() {
+        Log.e("fetching", "fetched from " + day + "-" + month + "-" + year);
+        if (task != null)
+            task.cancel(true);
+        task = new GetAllItemsTask(model, year, month, day);
+        task.setOnProcessingEndListener(listOnProcessingEndListener);
+        task.execute();
+    }
+
     @Override
     public String toString() {
         return "Items";
@@ -144,12 +200,7 @@ public class ItemsFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
-        if (task != null)
-            task.cancel(true);
-
-        task = new GetAllItemsTask(model);
-        task.setOnProcessingEndListener(listOnProcessingEndListener);
-        task.execute();
+        fetchData();
     }
 
     @Override

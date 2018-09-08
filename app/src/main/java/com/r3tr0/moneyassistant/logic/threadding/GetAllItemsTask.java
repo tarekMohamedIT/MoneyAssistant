@@ -15,7 +15,7 @@ public class GetAllItemsTask extends BaseBackgroundTask {
     private ItemsDatabaseModel model;
 
 
-    public GetAllItemsTask(ItemsDatabaseModel databaseModel) {
+    public GetAllItemsTask(ItemsDatabaseModel databaseModel, final Integer years, final Integer months, final Integer days) {
         super();
         this.model = databaseModel;
         setUseCase(new IUseCase<List<Item>>() {
@@ -42,11 +42,13 @@ public class GetAllItemsTask extends BaseBackgroundTask {
                     }
                 });
 
-                List<Item> items = model.getAllItems();
+                List<Item> items = model.getAllItems(years, months, days);
                 model.setOnDatabaseRowReadListener(null);
                 currentDate = null;
                 return items;
             }
         });
     }
+
+
 }

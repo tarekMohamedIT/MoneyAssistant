@@ -1,6 +1,7 @@
 package com.r3tr0.moneyassistant.core.database.models;
 
 import android.database.Cursor;
+import android.util.Log;
 
 import com.r3tr0.moneyassistant.core.interfaces.IDatabaseManager;
 import com.r3tr0.moneyassistant.core.interfaces.OnDatabaseRowReadListener;
@@ -33,7 +34,7 @@ public class ItemsDatabaseModel extends BaseDatabaseModel<Item> {
                 "name varchar," +
                 "quantity integer," +
                 "price double," +
-                "date long," +
+                "date varchar," +
                 "walletID integer)");
     }
 
@@ -45,11 +46,13 @@ public class ItemsDatabaseModel extends BaseDatabaseModel<Item> {
     @Override
     public void addNew(Item data) {
 
+        DateTime testingDateTime = data.getPurchaseDate();
+        testingDateTime.addMonths(-1);
         manager.executeOrder("insert into items (name, quantity, price, date, walletID) values (" +
                 "'" + data.getName() + "'," +
                 "" + data.getQuantity() + "," +
                 "" + data.getPrice() + "," +
-                "" + data.getPurchaseDate().getTimeInMilliseconds() + "," +
+                "'" + testingDateTime.getDateTime(DateTime.DEFAULT_DATE_REVERSE).replace("/", "-") + "'," +
                 "" + data.getWalletID() + ")");
     }
 
@@ -69,7 +72,7 @@ public class ItemsDatabaseModel extends BaseDatabaseModel<Item> {
                     , cursor.getString(1)
                     , cursor.getDouble(3)
                     , cursor.getInt(2)
-                    , new DateTime(cursor.getLong(4))
+                    , new DateTime(cursor.getString(4), DateTime.DEFAULT_DATE_REVERSE.replace("/", "-"))
                     , cursor.getInt(5));
 
             if (onDatabaseRowReadListener != null)
@@ -86,7 +89,7 @@ public class ItemsDatabaseModel extends BaseDatabaseModel<Item> {
                 "name='" + newData.getName() + "'," +
                 "quantity=" + newData.getQuantity() + "," +
                 "price=" + newData.getPrice() + "," +
-                "date=" + newData.getPurchaseDate().getTimeInMilliseconds() + "," +
+                "date='" + newData.getPurchaseDate().getDateTime(DateTime.DEFAULT_DATE_REVERSE).replace("/", "-") + "'," +
                 "walletID=" + newData.getWalletID() +
                 " where itemID=" + id);
     }
@@ -96,7 +99,7 @@ public class ItemsDatabaseModel extends BaseDatabaseModel<Item> {
         manager.executeOrder("delete from items");
     }
 
-    public List<Item> getItemsByWalletID(int walletID){
+    public List<Item> getAllItems(int walletID) {
         ArrayList<Item> items = new ArrayList<>();
         Cursor cursor = (Cursor) manager.executeQuery("select * from items where walletID=" + walletID);
 
@@ -106,10 +109,85 @@ public class ItemsDatabaseModel extends BaseDatabaseModel<Item> {
                     , cursor.getString(1)
                     , cursor.getDouble(3)
                     , cursor.getInt(2)
-                    , new DateTime(cursor.getLong(4))
+                    , new DateTime(cursor.getString(4), DateTime.DEFAULT_DATE_REVERSE.replace("/", "-"))
                     , cursor.getInt(5)));
         }
 
         return items;
+    }
+
+    public List<Item> getAllItems(int years, int months, int days) {
+        String sql;
+
+        if (years == 0)
+            sql = "select * from items order by date";
+        else if (months == 0)
+            sql = "select * from items where date like '" + years + "%' order by date";
+        else if (days == 0)
+            sql = "select * from items where date like '" + years + "-" + String.format("%02d", months) + "%' order by date";
+        else
+            sql = "select * from items where date like '" + years + "-" + String.format("%02d", months) + "-" + String.format("%02d", days) + "' order by date";
+
+        ArrayList<Item> items = new ArrayList<>();
+        Cursor cursor = (Cursor) manager.executeQuery(sql);
+
+        while (cursor.moveToNext()) {
+            Item item = new Item(
+                    cursor.getInt(0)
+                    , cursor.getString(1)
+                    , cursor.getDouble(3)
+                    , cursor.getInt(2)
+                    , new DateTime(cursor.getString(4), DateTime.DEFAULT_DATE_REVERSE.replace("/", "-"))
+                    , cursor.getInt(5));
+
+            if (onDatabaseRowReadListener != null)
+                onDatabaseRowReadListener.onRowRead(items, item);
+
+            items.add(item);
+        }
+        return items;
+
+
+    }
+
+    public List<String> getAllYears() {
+        ArrayList<String> strings = new ArrayList<>();
+        strings.add("All");
+
+        Cursor cursor = (Cursor) manager.executeQuery("select distinct (SUBSTR(date, 1, 4)) AS years FROM items ORDER BY years");
+
+        while (cursor.moveToNext()) {
+            strings.add(cursor.getString(0));
+        }
+
+        return strings;
+    }
+
+    public List<String> getMonths(int years) {
+
+        ArrayList<String> strings = new ArrayList<>();
+        strings.add("All");
+        String sql = "select distinct (SUBSTR(date, 6, 2)) AS months FROM items where date like '" + years + "%' ORDER BY months";
+        Cursor cursor = (Cursor) manager.executeQuery(sql);
+
+        while (cursor.moveToNext()) {
+            strings.add(cursor.getString(0));
+        }
+
+        return strings;
+    }
+
+    public List<String> getDays(int years, int months) {
+        ArrayList<String> strings = new ArrayList<>();
+        strings.add("All");
+        String sql = "select distinct (SUBSTR(date, 9, 2)) AS days FROM items where date like '" + years + "-" + String.format("%02d", months) + "%' ORDER BY days";
+        Log.e("sql", sql);
+        Cursor cursor = (Cursor) manager.executeQuery(sql);
+
+        while (cursor.moveToNext()) {
+            strings.add(cursor.getString(0));
+        }
+
+        return strings;
     }
 }
