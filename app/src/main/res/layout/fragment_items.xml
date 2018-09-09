@@ -45,24 +45,27 @@
 
         <Button
             android:id="@+id/yearsButton"
+            style="@style/MyButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="4"
-            android:text="Years" />
+            android:text="All" />
 
         <Button
             android:id="@+id/monthsButton"
+            style="@style/MyButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="3"
-            android:text="Months" />
+            android:text="All" />
 
         <Button
             android:id="@+id/daysButton"
+            style="@style/MyButtonStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="3"
-            android:text="Days" />
+            android:text="All" />
     </LinearLayout>
 
     <android.support.v7.widget.RecyclerView

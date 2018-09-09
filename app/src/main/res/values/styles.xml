@@ -18,6 +18,10 @@
         <item name="android:layout_marginTop">10dp</item>
     </style>
 
+    <style name="MyButtonStyle" parent="@style/Widget.AppCompat.Button.Colored">
+
+    </style>
+
     <style name="MyActionBar" parent="@style/Widget.AppCompat.ActionBar.Solid">
         <item name="titleTextStyle">@style/MyTitleTextStyle</item>
     </style>

@@ -12,21 +12,38 @@ import java.util.List;
 
 import CSTime.DateTime;
 
+/**
+ * An extension of the {@link BaseDatabaseModel} class.
+ * Used to communicate with the database to grab the items from the database.
+ * The {@link ItemsDatabaseModel} uses {@link Item} as a parameter to return it
+ * through it's methods.
+ */
+
 public class ItemsDatabaseModel extends BaseDatabaseModel<Item> {
+
+    //An event listener for database row reading event.
     private OnDatabaseRowReadListener onDatabaseRowReadListener;
 
+    /**
+     * A constructor to the {@link BaseDatabaseModel} base class.
+     *
+     * @param manager The linked {@link IDatabaseManager} class.
+     */
     public ItemsDatabaseModel(IDatabaseManager manager) {
         super(manager);
     }
 
-    public OnDatabaseRowReadListener getOnDatabaseRowReadListener() {
-        return onDatabaseRowReadListener;
-    }
-
+    /**
+     * A setter for the row reading event listener.
+     * @param onDatabaseRowReadListener
+     */
     public void setOnDatabaseRowReadListener(OnDatabaseRowReadListener onDatabaseRowReadListener) {
         this.onDatabaseRowReadListener = onDatabaseRowReadListener;
     }
 
+    /**
+     * The table creating method
+     */
     @Override
     public void createTable() {
         manager.executeOrder("create table if not exists items (" +
@@ -38,11 +55,18 @@ public class ItemsDatabaseModel extends BaseDatabaseModel<Item> {
                 "walletID integer)");
     }
 
+    /**
+     * The table dropping method
+     */
     @Override
     public void dropTable() {
         manager.executeOrder("drop table items");
     }
 
+    /**
+     * The new item adding method.
+     * @param data The new data item.
+     */
     @Override
     public void addNew(Item data) {
 
@@ -56,11 +80,19 @@ public class ItemsDatabaseModel extends BaseDatabaseModel<Item> {
                 "" + data.getWalletID() + ")");
     }
 
+    /**
+     *the deleting method by item id
+     * @param id The ID of the required item
+     */
     @Override
     public void delete(int id) {
         manager.executeOrder("delete * from items where itemID=" + id);
     }
 
+    /**
+     * A method that gets all the items from the table
+     * @return A list of items from the table
+     */
     @Override
     public List<Item> getAllItems() {
         ArrayList<Item> items = new ArrayList<>();
@@ -83,6 +115,11 @@ public class ItemsDatabaseModel extends BaseDatabaseModel<Item> {
         return items;
     }
 
+    /**
+     * The item replacing method
+     * @param id The ID of the required item
+     * @param newData The new item's data
+     */
     @Override
     public void replaceItem(int id, Item newData) {
         manager.executeOrder("update items set " +
@@ -94,11 +131,19 @@ public class ItemsDatabaseModel extends BaseDatabaseModel<Item> {
                 " where itemID=" + id);
     }
 
+    /**
+     * A method for clearing the table.
+     */
     @Override
     public void clearAll() {
         manager.executeOrder("delete from items");
     }
 
+    /**
+     * A method for getting all items by it's wallet ID.
+     * @param walletID The ID of the wallet.
+     * @return A list of items from the table.
+     */
     public List<Item> getAllItems(int walletID) {
         ArrayList<Item> items = new ArrayList<>();
         Cursor cursor = (Cursor) manager.executeQuery("select * from items where walletID=" + walletID);
@@ -116,6 +161,15 @@ public class ItemsDatabaseModel extends BaseDatabaseModel<Item> {
         return items;
     }
 
+    /**
+     * A method for getting all items by it's entry date using it's {@link DateTime}.
+     * When given 0 to any of the 3 parameters, meaning it should get all of the items.
+     *
+     * @param years The year required to get items from
+     * @param months The month required to get items from
+     * @param days The day required to get items from
+     * @return A list of items from the table.
+     */
     public List<Item> getAllItems(int years, int months, int days) {
         String sql;
 
@@ -150,6 +204,10 @@ public class ItemsDatabaseModel extends BaseDatabaseModel<Item> {
 
     }
 
+    /**
+     * A method for getting all unique years in the table.
+     * @return A list of strings containing the years.
+     */
     public List<String> getAllYears() {
         ArrayList<String> strings = new ArrayList<>();
         strings.add("All");
@@ -163,6 +221,11 @@ public class ItemsDatabaseModel extends BaseDatabaseModel<Item> {
         return strings;
     }
 
+    /**
+     * A method for getting all unique months inside a year.
+     * @param years The year that the user requires months from.
+     * @return A list of strings containing the months.
+     */
     public List<String> getMonths(int years) {
 
         ArrayList<String> strings = new ArrayList<>();
@@ -177,6 +240,12 @@ public class ItemsDatabaseModel extends BaseDatabaseModel<Item> {
         return strings;
     }
 
+    /**
+     * A method for getting all unique days inside a month of a year.
+     * @param years The year that the user requires days from.
+     * @param months The month that the user requires days from.
+     * @return A list of strings containing the days.
+     */
     public List<String> getDays(int years, int months) {
         ArrayList<String> strings = new ArrayList<>();
         strings.add("All");
