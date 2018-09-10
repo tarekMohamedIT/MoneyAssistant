@@ -38,7 +38,7 @@ import CSTime.DateTime;
 public class ItemsDatabaseModel extends BaseDatabaseModel<Item> {
 
     //An event listener for database row reading event.
-    private OnDatabaseRowReadListener onDatabaseRowReadListener;
+    private OnDatabaseRowReadListener<Item> onDatabaseRowReadListener;
 
     /**
      * A constructor to the {@link BaseDatabaseModel} base class.
@@ -98,7 +98,7 @@ public class ItemsDatabaseModel extends BaseDatabaseModel<Item> {
 
     /**
      *the deleting method by item id
-     * @param id The ID of the required item
+     * @param id The ID of the required item to be deleted.
      */
     @Override
     public void delete(int id) {

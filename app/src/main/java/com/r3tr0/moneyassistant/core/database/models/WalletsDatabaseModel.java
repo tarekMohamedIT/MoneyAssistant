@@ -26,11 +26,26 @@ import com.r3tr0.moneyassistant.core.models.Wallet;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * An extension of the {@link BaseDatabaseModel} class.
+ * Used to communicate with the database to grab the items from the database.
+ * The {@link WalletsDatabaseModel} uses {@link Wallet} as a parameter to return it
+ * through it's methods.
+ */
 public class WalletsDatabaseModel extends BaseDatabaseModel<Wallet> {
+
+    /**
+     * A constructor to the {@link BaseDatabaseModel} base class.
+     *
+     * @param manager The linked {@link IDatabaseManager} class.
+     */
     public WalletsDatabaseModel(IDatabaseManager manager) {
         super(manager);
     }
 
+    /**
+     * The table creating method
+     */
     @Override
     public void createTable() {
         manager.executeOrder("create table if not exists wallets (" +
@@ -42,11 +57,19 @@ public class WalletsDatabaseModel extends BaseDatabaseModel<Wallet> {
                 "isPrimary boolean)");
     }
 
+    /**
+     * The table dropping method
+     */
     @Override
     public void dropTable() {
         manager.executeOrder("drop table wallets");
     }
 
+    /**
+     * The new wallet adding method.
+     *
+     * @param data The new wallet's data.
+     */
     @Override
     public void addNew(Wallet data) {
         if (data.isPrimary()){
@@ -61,11 +84,19 @@ public class WalletsDatabaseModel extends BaseDatabaseModel<Wallet> {
                 "" + (data.isPrimary()? 1 : 0) + ")");
     }
 
+    /**
+     *the deleting method by wallet id
+     * @param id The ID of the required wallet to be deleted.
+     */
     @Override
     public void delete(int id) {
         manager.executeOrder("delete * from wallets where walletID=" + id);
     }
 
+    /**
+     * A method that gets all the wallets from the table
+     * @return A list of wallets from the table
+     */
     @Override
     public List<Wallet> getAllItems() {
         List<Wallet> wallets = new ArrayList<>();
@@ -83,6 +114,11 @@ public class WalletsDatabaseModel extends BaseDatabaseModel<Wallet> {
         return wallets;
     }
 
+    /**
+     * The wallet replacing method
+     * @param id The ID of the required wallet
+     * @param newData The new wallet's data
+     */
     @Override
     public void replaceItem(int id, Wallet newData) {
         if (newData.isPrimary()){
@@ -98,6 +134,11 @@ public class WalletsDatabaseModel extends BaseDatabaseModel<Wallet> {
                 " where walletID=" + id);
     }
 
+    /**
+     * A method that gets a wallet from the table by it's id.
+     * @param id The ID of the wallet.
+     * @return A wallet object from the table.
+     */
     public Wallet getWalletByID(int id){
         Cursor cursor = (Cursor) manager.executeQuery("select * from wallets where walletID=" + id);
 
@@ -113,6 +154,11 @@ public class WalletsDatabaseModel extends BaseDatabaseModel<Wallet> {
         return null;
     }
 
+    /**
+     * A method that gets a wallet from the table by it's name.
+     * @param name The name of the wallet.
+     * @return A wallet object from the table.
+     */
     public Wallet getWalletByName(String name){
         Cursor cursor = (Cursor) manager.executeQuery("select * from wallets where name='" + name + "'");
 
@@ -128,15 +174,28 @@ public class WalletsDatabaseModel extends BaseDatabaseModel<Wallet> {
         return null;
     }
 
+    /**
+     * A method for clearing the table.
+     */
     @Override
     public void clearAll() {
         manager.executeOrder("delete from wallets");
     }
 
+    /**
+     * Adds balance to a wallet by it's ID.
+     * @param walletID The ID of the wallet.
+     * @param amount The amount of money to be added to the wallet.
+     */
     public void addMoney(int walletID, double amount){
         manager.executeOrder(String.format("update wallets set total=total+%s, remaining=remaining+%s where walletID=%s", amount, amount, walletID));
     }
 
+    /**
+     * Subtracts balance from a wallet by it's ID.
+     * @param walletID The ID of the wallet.
+     * @param amount The amount of money to be removed from the wallet.
+     */
     public void subtractMoney(int walletID, double amount){
         Wallet wallet = getWalletByID(walletID);
 
@@ -144,9 +203,7 @@ public class WalletsDatabaseModel extends BaseDatabaseModel<Wallet> {
             if (amount <= wallet.getRemainingMoney())
                 manager.executeOrder(String.format("update wallets set remaining=remaining-%s where walletID=%s", amount, walletID));
             else throw new WalletInsufficientBalanceException();
-        }
-
-        else
+        } else
             throw new WalletNotExistedException();
     }
 

@@ -19,6 +19,9 @@ package com.r3tr0.moneyassistant.core.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+/**
+ * A model class for the Wallets in the database to be used.
+ */
 public class Wallet implements Parcelable {
     private int walletID;
     private String name;

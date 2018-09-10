@@ -22,6 +22,9 @@ import android.support.annotation.NonNull;
 
 import CSTime.DateTime;
 
+/**
+ * A model class for the Items in the database to be used.
+ */
 public class Item implements Parcelable, Comparable<Item>{
     private int id;
     private String name;

@@ -38,7 +38,7 @@ public class GetAllItemsTask extends BaseBackgroundTask {
             private DateTime currentDate;
             @Override
             public List<Item> processInBackground() {
-                model.setOnDatabaseRowReadListener(new OnDatabaseRowReadListener() {
+                model.setOnDatabaseRowReadListener(new OnDatabaseRowReadListener<Item>() {
                     @Override
                     public void onRowRead(List<Item> items, Item item) {
                         Log.e("current date status", currentDate == null ? "is" : "isn't");//checking on the current date

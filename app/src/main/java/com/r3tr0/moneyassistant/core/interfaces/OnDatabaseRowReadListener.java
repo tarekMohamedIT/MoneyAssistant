@@ -16,10 +16,19 @@ package com.r3tr0.moneyassistant.core.interfaces;
  * limitations under the License.
  */
 
-import com.r3tr0.moneyassistant.core.models.Item;
-
 import java.util.List;
 
-public interface OnDatabaseRowReadListener {
-    void onRowRead(List<Item> items, Item item);
+/**
+ * The event of reading a row from the database.
+ *
+ * @param <T> The type of the returned value from the database.
+ */
+public interface OnDatabaseRowReadListener<T> {
+
+    /**
+     * The Row reading event listener.
+     * @param items The List of all the already read items.
+     * @param item The new item to be added to the previous list.
+     */
+    void onRowRead(List<T> items, T item);
 }

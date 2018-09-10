@@ -21,10 +21,12 @@ import android.graphics.Color;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.r3tr0.graphengine.core.popups.PopupView;
 import com.r3tr0.moneyassistant.core.interfaces.OnItemClickListener;
 import com.r3tr0.moneyassistant.ui.adapters.StringsRecyclerAdapter;
+import com.r3tr0.moneyassistant.utils.Converters;
 
 import java.util.ArrayList;
 
@@ -34,10 +36,12 @@ public class PopupMenu extends PopupView{
     private StringsRecyclerAdapter adapter;
     private OnItemClickListener onItemClickListener;
 
+
     public PopupMenu(Context context, View anchorView) {
         super(context, new RecyclerView(context), anchorView);
         this.context = context;
         recyclerView = (RecyclerView) this.popupWindow.getContentView();
+
         recyclerView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
         adapter = new StringsRecyclerAdapter(context, new ArrayList<String>());
         adapter.setOnItemClickListener(new OnItemClickListener() {
@@ -58,6 +62,9 @@ public class PopupMenu extends PopupView{
 
     public void setParentView(View parentView){
         this.parentView = parentView;
+        this.popupWindow.setWidth(this.parentView.getWidth());
+        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        recyclerView.setLayoutParams(params);
     }
 
     public StringsRecyclerAdapter getAdapter() {
@@ -66,6 +73,6 @@ public class PopupMenu extends PopupView{
 
     public void showList(int offset){
 
-        showView(parentView.getWidth() - offset, parentView.getHeight(), Color.parseColor("#FFFFFF"));
+        showView(Converters.dpToPx(8), parentView.getHeight(), Color.parseColor("#FFFFFF"));
     }
 }

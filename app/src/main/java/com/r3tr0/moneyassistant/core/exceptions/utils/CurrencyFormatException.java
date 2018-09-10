@@ -16,6 +16,9 @@ package com.r3tr0.moneyassistant.core.exceptions.utils;
  * limitations under the License.
  */
 
+/**
+ * A runtime exception for invalid currency format (see {@link com.r3tr0.moneyassistant.utils.Regex})
+ */
 public class CurrencyFormatException extends RuntimeException {
 
     public CurrencyFormatException() {

@@ -18,14 +18,18 @@ package com.r3tr0.moneyassistant.ui.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.r3tr0.moneyassistant.R;
 import com.r3tr0.moneyassistant.core.interfaces.OnItemClickListener;
 
 import java.util.List;
+
+import static com.r3tr0.moneyassistant.utils.Converters.dpToPx;
 
 public class StringsRecyclerAdapter extends RecyclerView.Adapter<StringsRecyclerAdapter.StringViewHolder>{
     Context context;
@@ -48,12 +52,15 @@ public class StringsRecyclerAdapter extends RecyclerView.Adapter<StringsRecycler
     @Override
     public StringViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         FrameLayout layout = new FrameLayout(context);
-        layout.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        layout.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         TextView textView = new TextView(context);
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.leftMargin = 24;
-        params.rightMargin = 24;
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.leftMargin = dpToPx(16);
+        params.rightMargin = dpToPx(16);
+        params.topMargin = dpToPx(4);
+        params.bottomMargin = dpToPx(4);
+        Log.e("test margins", dpToPx(8) + " : " + context.getResources().getDimension(R.dimen.items_offset));
         textView.setLayoutParams(params);
         layout.addView(textView);
         return new StringViewHolder(layout);

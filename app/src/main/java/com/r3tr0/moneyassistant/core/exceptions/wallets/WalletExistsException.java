@@ -16,6 +16,9 @@ package com.r3tr0.moneyassistant.core.exceptions.wallets;
  * limitations under the License.
  */
 
+/**
+ * A runtime exception that indicates that another wallet by the same name exists in the database.
+ */
 public class WalletExistsException extends RuntimeException {
     public WalletExistsException() {
         super("A wallet by the same name already exists");

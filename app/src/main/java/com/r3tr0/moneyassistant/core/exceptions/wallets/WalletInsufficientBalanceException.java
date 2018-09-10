@@ -16,6 +16,9 @@ package com.r3tr0.moneyassistant.core.exceptions.wallets;
  * limitations under the License.
  */
 
+/**
+ *
+ */
 public class WalletInsufficientBalanceException extends RuntimeException {
     public WalletInsufficientBalanceException() {
         super("This wallet has insufficient balance!");

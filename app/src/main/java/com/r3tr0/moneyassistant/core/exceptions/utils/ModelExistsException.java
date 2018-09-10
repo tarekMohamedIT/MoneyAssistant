@@ -16,6 +16,11 @@ package com.r3tr0.moneyassistant.core.exceptions.utils;
  * limitations under the License.
  */
 
+
+/**
+ * A runtime exception for {@link com.r3tr0.moneyassistant.core.interfaces.IDatabaseModel} exists
+ * in the Database manager.
+ */
 public class ModelExistsException extends RuntimeException {
     public ModelExistsException() {
         super("This model already exists in this manager");

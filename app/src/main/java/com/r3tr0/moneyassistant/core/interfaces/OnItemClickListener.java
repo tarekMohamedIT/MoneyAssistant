@@ -19,9 +19,15 @@ package com.r3tr0.moneyassistant.core.interfaces;
 import android.view.View;
 
 /**
- * Created by r3tr0 on 4/30/18.
+ * The event of RecyclerView's On item click.
  */
-
 public interface OnItemClickListener {
+
+    /**
+     * The OnClickEventListener
+     *
+     * @param position The position of the pressed item.
+     * @param view     The View of the pressed item.
+     */
     void onClick(int position, View view);
 }

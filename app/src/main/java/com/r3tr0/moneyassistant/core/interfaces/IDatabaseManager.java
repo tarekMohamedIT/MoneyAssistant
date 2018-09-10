@@ -16,6 +16,9 @@ package com.r3tr0.moneyassistant.core.interfaces;
  * limitations under the License.
  */
 
+/**
+ * @param <Query>
+ */
 public interface IDatabaseManager<Query> {
     void createDatabase(String databaseName);
 

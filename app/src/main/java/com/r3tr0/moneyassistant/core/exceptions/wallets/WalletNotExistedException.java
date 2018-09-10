@@ -16,6 +16,9 @@ package com.r3tr0.moneyassistant.core.exceptions.wallets;
  * limitations under the License.
  */
 
+/**
+ * A runtime exception indicating that the requested Wallet does not exist in the database.
+ */
 public class WalletNotExistedException extends RuntimeException {
     public WalletNotExistedException() {
         super("This wallet does not exist");

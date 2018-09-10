@@ -18,6 +18,16 @@ package com.r3tr0.moneyassistant.core.interfaces;
 
 import java.util.List;
 
+/**
+ * Used to communicate with the database to grab the items from the database.
+ * <p>
+ * The main idea of the Database Model is to provide methods for pure-java classes to communicate
+ * with the database and to bind that model to a database manager through which the methods
+ * are executed and the program can communicate with a database.
+ *
+ * @param <V> The type of data the should be returned from the database,
+ *            ie : {@link com.r3tr0.moneyassistant.core.models.Item}.
+ */
 public interface IDatabaseModel<V> {
 
     /**
@@ -36,8 +46,28 @@ public interface IDatabaseModel<V> {
      * @param data The new data item.
      */
     void addNew(V data);
+
+    /**
+     *the deleting method by item id
+     * @param id The ID of the required item to be deleted.
+     */
     void delete(int id);
+
+    /**
+     * A method that gets all the items from the table
+     * @return A list of items from the table
+     */
     List<V> getAllItems();
+
+    /**
+     * The item replacing method
+     * @param id The ID of the required item
+     * @param newData The new item's data
+     */
     void replaceItem(int id, V newData);
+
+    /**
+     * A method for clearing the table.
+     */
     void clearAll();
 }

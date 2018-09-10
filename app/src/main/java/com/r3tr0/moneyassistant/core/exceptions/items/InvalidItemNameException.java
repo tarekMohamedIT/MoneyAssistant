@@ -16,12 +16,15 @@ package com.r3tr0.moneyassistant.core.exceptions.items;
  * limitations under the License.
  */
 
+/**
+ * A runtime exception when the item's name is invalid.
+ */
 public class InvalidItemNameException extends RuntimeException {
     public InvalidItemNameException() {
-        super("The item's name should be between 3 to 30 characters");
+        super("The item's name is invalid");
     }
 
     public InvalidItemNameException(Throwable cause) {
-        super("The item's name should be between 3 to 30 characters", cause);
+        super("The item's name is invalid", cause);
     }
 }

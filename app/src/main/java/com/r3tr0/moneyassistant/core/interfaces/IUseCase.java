@@ -16,6 +16,20 @@ package com.r3tr0.moneyassistant.core.interfaces;
  * limitations under the License.
  */
 
+/**
+ * -An interface that is used for background operations.
+ * -Paired with the {@link OnProcessingEndListener} interface, You can make rxjava-like connection
+ * to a thread to finish processing, then show the processing on the UI thread.
+ * <p>
+ * -IE : {@link com.r3tr0.moneyassistant.logic.threadding.GetAllItemsTask}
+ *
+ * @param <Output> The output that the background processing should return.
+ */
 public interface IUseCase<Output> {
+
+    /**
+     * A method that should define what to do in the background.
+     * @return The result of the operation.
+     */
     Output processInBackground();
 }
